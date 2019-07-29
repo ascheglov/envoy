@@ -4217,6 +4217,11 @@ virtual_hosts:
     domains: ["*"]
     cors:
       allow_origin: ["test-origin"]
+      allow_origin_regex:
+      - .*\.envoyproxy\.io
+      allow_origin_safe_regex:
+      - google_re_engine: {}
+        regex: .*\.envoyproxy\.io
       allow_methods: "test-methods"
       allow_headers: "test-headers"
       expose_headers: "test-expose-headers"
@@ -4259,6 +4264,7 @@ virtual_hosts:
   EXPECT_EQ(cors_policy->enabled(), false);
   EXPECT_EQ(cors_policy->shadowEnabled(), true);
   EXPECT_THAT(cors_policy->allowOrigins(), ElementsAreArray({"test-origin"}));
+  EXPECT_EQ(2, cors_policy->allowOriginRegexes().size());
   EXPECT_EQ(cors_policy->allowMethods(), "test-methods");
   EXPECT_EQ(cors_policy->allowHeaders(), "test-headers");
   EXPECT_EQ(cors_policy->exposeHeaders(), "test-expose-headers");
