@@ -7,6 +7,25 @@
 namespace Envoy {
 namespace Http {
 
+class Coroutine {
+public:
+  struct promise_type {
+    Future get_return_object() { return {this}; }
+    std::experimental::suspend_never initial_suspend() { return {}; }
+    std::experimental::suspend_always final_suspend() { return {}; }
+    void return_void() {}
+  };
+
+  explicit Coroutine(promise_type* promise) : promise_(promise) {}
+
+  std::experimental::coroutine_handle<> handle() {
+    return std::experimental::coroutine_handle<promise_type>::from_promise(promise_);
+  }
+
+private:
+  promise_type* promise_;
+};
+
 class StreamDecoderCoroFilter : public StreamDecoderFilter {
 public:
   bool is_end_stream() const { return end_stream_; }
